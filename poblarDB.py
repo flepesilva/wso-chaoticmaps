@@ -4,9 +4,9 @@ import json
 bd = BD()
 
 
-scp = False
-ben = True
-mhs = ['WSO']
+scp = True
+ben = False
+mhs = ['WSO', 'MFO']
 cantidad = 0
 
 DS_actions = [
@@ -33,12 +33,12 @@ paramsML = json.dumps({
 if scp:
     # poblar ejecuciones SCP
     instancias = bd.obtenerInstancias(f'''
-                                      'scp41'
+                                      'scp41', 'scp42', 'scp43', 'scp44'
                                       ''')
     print(instancias)
-    iteraciones = 20
-    experimentos = 3
-    poblacion = 10
+    iteraciones = 100
+    experimentos = 1
+    poblacion = 30
     for instancia in instancias:
 
         for mh in mhs:
@@ -57,7 +57,7 @@ if scp:
 if ben:
     # poblar ejecuciones Benchmark
     instancias = bd.obtenerInstancias(f'''
-                                      "F1"
+                                      "F1", "F2", "F3"
                                       ''')
     iteraciones = 500
     experimentos = 3 

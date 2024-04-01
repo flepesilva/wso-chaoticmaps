@@ -28,7 +28,7 @@ incluye_wso = False
 bd = BD()
 
 instancias = bd.obtenerInstancias(f'''
-                                  "F1"
+                                  "F1", "F2", "F3"
                                   ''')
 print(instancias)
 for instancia in instancias:
