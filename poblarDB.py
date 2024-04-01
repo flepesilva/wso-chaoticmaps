@@ -6,7 +6,7 @@ bd = BD()
 
 scp = False
 ben = True
-mhs = ['WSO']
+mhs = ['WSO', 'SCA', 'GWO', 'WOA', 'PSA']
 cantidad = 0
 
 DS_actions = [
@@ -37,7 +37,7 @@ if scp:
                                       ''')
     print(instancias)
     iteraciones = 20
-    experimentos = 3
+    experimentos = 1
     poblacion = 10
     for instancia in instancias:
 

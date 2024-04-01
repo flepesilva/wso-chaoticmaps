@@ -109,19 +109,27 @@ def solverB(id, mh, maxIter, pop, function, lb, ub, dim):
                 poblacion[i, j] = np.clip(poblacion[i, j], lb[j], ub[j])            
 
             fitness[i] = f(function, poblacion[i])
+            # Evaluar el fitness
+            if fitness[i] < fit[i]:
+                wbest[i, :] = poblacion[i, :] #actualizar la mejor posicion
+                fit[i] = fitness[i] #Actualizar el fitness
+            # Encontrar las mejores posiciones.
+            if fit[i] < BestFitness:
+                BestFitness = fit[i]
+                Best = wbest[i, :] #Actualizar las mejores posiciones globales.
             
-        solutionsRanking = np.argsort(fitness) # rankings de los mejores fitness
+        # solutionsRanking = np.argsort(fitness) # rankings de los mejores fitness
 
-        #Conservo el Best
-        if fitness[solutionsRanking[0]] < BestFitness:
-            BestFitness = fitness[solutionsRanking[0]]
-            Best = poblacion[solutionsRanking[0]]
+        # #Conservo el Best
+        # if fitness[solutionsRanking[0]] < BestFitness:
+        #     BestFitness = fitness[solutionsRanking[0]]
+        #     Best = poblacion[solutionsRanking[0]]
 
-        #wbest
-        if mh == 'WSO':
-            if fitness[solutionsRanking[0]] < fit[bestRowAux]:
-                wbest[bestRowAux, :] = poblacion[solutionsRanking[0], :]
-                fit[bestRowAux] = fitness[solutionsRanking[0]]
+        # #wbest
+        # if mh == 'WSO':
+        #     if fitness[solutionsRanking[0]] < fit[bestRowAux]:
+        #         wbest[bestRowAux, :] = poblacion[solutionsRanking[0], :]
+        #         fit[bestRowAux] = fitness[solutionsRanking[0]]
 
         div_t = diversidadHussain(poblacion)
 
