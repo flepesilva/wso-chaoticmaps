@@ -6,7 +6,7 @@ bd = BD()
 
 scp = False
 ben = True
-mhs = ['WOA','GWO']
+mhs = ['WSO']
 cantidad = 0
 
 DS_actions = [
