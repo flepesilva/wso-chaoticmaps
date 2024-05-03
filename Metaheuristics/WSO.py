@@ -18,8 +18,8 @@ def iterarWSO(max_iter, iter, dim, whiteSharks, WSO_Positions, gbest, lb, ub, v,
     p1 = pmax + (pmax - pmin) * np.exp(-(4 * iter / max_iter) ** 2)
     p2 = pmin + (pmax - pmin) * np.exp(-(4 * iter / max_iter) ** 2)
     if lb is None and ub is None:
-        lb = np.zeros(dim)
-        ub = np.ones(dim)
+        lb = 0
+        ub = 1
 
     nu = np.floor(whiteSharks * np.random.rand(whiteSharks)).astype(int)
     for i in range(whiteSharks):
@@ -44,5 +44,6 @@ def iterarWSO(max_iter, iter, dim, whiteSharks, WSO_Positions, gbest, lb, ub, v,
                 else:
                     WSO_Pos = gbest[j] + random.random() * dist * np.sign(random.random() - 0.5)
                     WSO_Positions[i, j] = (WSO_Pos + WSO_Positions[i - 1, j]) / 2 * random.random()
+
 
     return WSO_Positions, v

@@ -27,7 +27,7 @@ incluye_wso = False
 bd = BD()
 
 instancias = bd.obtenerInstancias(f'''
-                                  "scp41"
+                                  'scp41', 'scp42', 'scp43', 'scp44', 'scp45', 'scp46', 'scp47', 'scp48', 'scp49', 'scp410'
                                   ''')
 print(instancias)
 

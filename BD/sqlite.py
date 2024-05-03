@@ -1,11 +1,12 @@
 import sqlite3
 import os
 from Problem.SCP.problem import obtenerOptimo
+from Problem.KP.problem import obtenerOptimoKP
 from util import util
 
 class BD:
     def __init__(self):
-        self.__dataBase = 'BD/resultados_scp.db'
+        self.__dataBase = 'BD/resultados.db'
         self.__conexion = None
         self.__cursor   = None
 
@@ -52,6 +53,7 @@ class BD:
         self.getCursor().execute(
             ''' CREATE TABLE IF NOT EXISTS experimentos(
                 id_experimento INTEGER PRIMARY KEY AUTOINCREMENT,
+                experimento TEXT,
                 MH TEXT,
                 paramMH TEXT,
                 ML TEXT,
@@ -87,8 +89,8 @@ class BD:
         
         self.commit()
         
-        self.insertarInstanciasBEN()
         self.insertarInstanciasSCP()
+        self.insertarInstanciasKP()
         
         self.desconectar()
     
@@ -101,6 +103,7 @@ class BD:
             self.getCursor().execute(f'''
                 INSERT INTO experimentos VALUES (
                     NULL,
+                    '{str(data["experimento"])}',
                     '{str(data["MH"])}',
                     '{str(data["paramMH"])}',
                     '{str(data["ML"])}',
@@ -130,49 +133,18 @@ class BD:
         self.commit()
         self.desconectar()
         
-    def insertarInstanciasBEN(self):
+    def insertarInstanciasKP(self):
         
         self.conectar()
         
-        data = ['F1','F2','F3','F4','F5','F6','F7','F8','F9','F10','F11']        
-        for instancia in data:
+        data = os.listdir('./Problem/KP/Instances/')        
+        for d in data:
+            tipoProblema = 'KP'
+            nombre = d
+            optimo = obtenerOptimoKP(nombre)
+            param = ''
             
-            tipoProblema = 'BEN'
-            if instancia == 'F1':
-                param     = f'lb:-100,ub:100,dim:30'
-                optimo = 0
-            if instancia == 'F2':
-                param     = f'lb:-10,ub:10,dim:30'
-                optimo = 0
-            if instancia == 'F3':
-                param     = f'lb:-100,ub:100,dim:30'
-                optimo = 0
-            if instancia == 'F4':
-                param     = f'lb:-100,ub:100,dim:30'
-                optimo = 0
-            if instancia == 'F5':
-                param     = f'lb:-30,ub:30,dim:30'
-                optimo = 0
-            if instancia == 'F6':
-                param     = f'lb:-100,ub:100,dim:30'
-                optimo = 0
-            if instancia == 'F7':
-                param     = f'lb:-1.28,ub:1.28,dim:30'
-                optimo = 0
-            if instancia == 'F8':
-                param     = f'lb:-500,ub:500,dim:30'
-                optimo = -2094.9145
-            if instancia == 'F9':
-                param     = f'lb:-5.12,ub:5.12,dim:30'
-                optimo = 0
-            if instancia == 'F10':
-                param     = f'lb:-32,ub:32,dim:30'
-                optimo = 0
-            if instancia == 'F11':
-                param     = f'lb:-600,ub:600,dim:30'
-                optimo = 0
-                
-            self.getCursor().execute(f'''  INSERT INTO instancias (tipo_problema, nombre, optimo, param) VALUES(?, ?, ?, ?) ''', (tipoProblema, instancia, optimo, param))
+            self.getCursor().execute(f'''  INSERT INTO instancias (tipo_problema, nombre, optimo, param) VALUES(?, ?, ?, ?) ''', (tipoProblema, nombre, optimo, param))
             
         self.commit()
         self.desconectar()
@@ -325,7 +297,7 @@ class BD:
             inner join experimentos e on r.fk_id_experimento = e.id_experimento
             inner join iteraciones i on i.fk_id_experimento = e.id_experimento
             inner join instancias i2 on e.fk_id_instancia = i2.id_instancia 
-            where i2.nombre  = '{instancia}' and e.ML = '{ml}' and e.paramMH = 'iter:500,pop:{bss},DS:V4-STD,cros:0.6;mut:0.01' and e.ML_FS = '{ml_fs}'
+            where i2.nombre  = '{instancia}' and e.ML = '{ml}' and e.paramMH = 'iter:500,pop:50,DS:V4-STD,cros:0.9;mut:{bss}' and e.ML_FS = '{ml_fs}'
             group by e.MH , i2.nombre, e.paramMH 
                        
         ''')
@@ -388,7 +360,27 @@ class BD:
             inner join experimentos e on r.fk_id_experimento = e.id_experimento
             inner join iteraciones i on i.fk_id_experimento = e.id_experimento
             inner join instancias i2 on e.fk_id_instancia = i2.id_instancia 
-            where i2.nombre  = '{instancia}' and e.ML = '{ml}' and e.paramMH = 'iter:500,pop:{bss},DS:V4-STD,cros:0.6;mut:0.01' and e.ML_FS = '{clasificador}'
+            where i2.nombre  = '{instancia}' and e.ML = '{ml}' and e.paramMH = 'iter:500,pop:50,DS:V4-STD,cros:0.9;mut:0.20' and e.ML_FS = '{clasificador}'
+                       
+        ''')
+        
+        data = cursor.fetchall()
+        
+        
+        self.desconectar()
+        return data
+    
+    def obtenerArchivosTecnica(self, instancia, ml, clasificador, tecnica):
+        self.conectar()
+        
+        cursor = self.getCursor()
+        cursor.execute(f'''             
+            select e.id_experimento , e.MH , E.ML, e.ML_FS, e.paramMH, i2.nombre  , i.nombre , i.archivo , r.fitness  
+            from resultados r 
+            inner join experimentos e on r.fk_id_experimento = e.id_experimento
+            inner join iteraciones i on i.fk_id_experimento = e.id_experimento
+            inner join instancias i2 on e.fk_id_instancia = i2.id_instancia 
+            where i2.nombre  = '{instancia}' and e.ML = '{ml}' and e.paramMH = 'iter:500,pop:50,DS:V4-STD,cros:0.9;mut:0.20' and e.ML_FS = '{clasificador}' and e.MH = '{tecnica}'
                        
         ''')
         
@@ -406,6 +398,113 @@ class BD:
         cursor = self.getCursor()
         cursor.execute(f''' select DISTINCT id_instancia, nombre from instancias i where nombre in ({problema})   ''')
         
+        data = cursor.fetchall()
+        
+        
+        self.desconectar()
+        return data
+    
+    def obtenerTecnicas(self):
+        self.conectar()
+        cursor = self.getCursor()
+        cursor.execute(f''' SELECT DISTINCT MH from experimentos e   ''')
+        data = cursor.fetchall()
+        
+        
+        self.desconectar()
+        return data
+    
+    def obtenerInstanciasEjecutadas(self, tipo_problema):
+        self.conectar()
+        cursor = self.getCursor()
+        cursor.execute(f''' select DISTINCT i.nombre  from experimentos e inner join instancias i on e.fk_id_instancia = i.id_instancia where i.tipo_problema = '{tipo_problema}' order by i.nombre asc ''')
+        data = cursor.fetchall()
+        
+        
+        self.desconectar()
+        return data
+    
+    def obtenerExperimentos(self, tipo_problema, mh):
+        self.conectar()
+        cursor = self.getCursor()
+        cursor.execute(f''' SELECT DISTINCT e.experimento  from experimentos e inner join instancias i on e.fk_id_instancia = i.id_instancia where i.tipo_problema = '{tipo_problema}' AND e.MH = '{mh}' ''')
+        data = cursor.fetchall()
+        
+        
+        self.desconectar()
+        return data
+    
+    def obtenerExperimentosEspecial(self, tipo_problema, mh, especial):
+        self.conectar()
+        cursor = self.getCursor()
+        cursor.execute(f''' SELECT DISTINCT e.experimento  from experimentos e inner join instancias i on e.fk_id_instancia = i.id_instancia where i.tipo_problema = '{tipo_problema}' AND e.MH = '{mh}' and e.experimento like '%{especial}%' ''')
+        data = cursor.fetchall()
+        
+        
+        self.desconectar()
+        return data
+    
+    def obtenerEjecuciones(self, instancia, mh, experimento):
+        self.conectar()
+        cursor = self.getCursor()
+        cursor.execute(f''' 
+                       
+                        select e.id_experimento , e.experimento, i.nombre , i.archivo , r.fitness, r.tiempoEjecucion  
+                        from resultados r 
+                        inner join experimentos e on r.fk_id_experimento = e.id_experimento
+                        inner join iteraciones i on i.fk_id_experimento = e.id_experimento
+                        inner join instancias i2 on e.fk_id_instancia = i2.id_instancia 
+                        where i2.nombre  = '{instancia}' and e.experimento = '{experimento}' and e.MH = '{mh}'
+                        
+                        ''')
+        data = cursor.fetchall()
+        
+        
+        self.desconectar()
+        return data
+    
+    def obtenerMejoresEjecucionesSCP(self, instancia, mh, experimento):
+        self.conectar()
+        cursor = self.getCursor()
+        cursor.execute(f''' 
+                       
+                        select e.id_experimento , e.experimento, i.nombre , i.archivo , MIN(r.fitness) 
+                        from resultados r 
+                        inner join experimentos e on r.fk_id_experimento = e.id_experimento
+                        inner join iteraciones i on i.fk_id_experimento = e.id_experimento
+                        inner join instancias i2 on e.fk_id_instancia = i2.id_instancia 
+                        where i2.nombre  = '{instancia}' and e.experimento = '{experimento}' and e.MH = '{mh}'
+                        
+                        ''')
+        data = cursor.fetchall()
+        
+        
+        self.desconectar()
+        return data
+    
+    def obtenerMejoresEjecucionesKP(self, instancia, mh, experimento):
+        self.conectar()
+        cursor = self.getCursor()
+        cursor.execute(f''' 
+                       
+                        select e.id_experimento , e.experimento, i.nombre , i.archivo , MAX(r.fitness) 
+                        from resultados r 
+                        inner join experimentos e on r.fk_id_experimento = e.id_experimento
+                        inner join iteraciones i on i.fk_id_experimento = e.id_experimento
+                        inner join instancias i2 on e.fk_id_instancia = i2.id_instancia 
+                        where i2.nombre  = '{instancia}' and e.experimento = '{experimento}' and e.MH = '{mh}'
+                        
+                        ''')
+        data = cursor.fetchall()
+        
+        
+        self.desconectar()
+        return data
+    
+    def obtenerOptimoInstancia(self, instancia):
+        self.conectar()
+        cursor = self.getCursor()
+        cursor.execute(f''' SELECT optimo  from instancias i where nombre = '{instancia}'  ''')
         data = cursor.fetchall()
         
         

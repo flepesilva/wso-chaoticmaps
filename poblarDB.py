@@ -6,7 +6,9 @@ bd = BD()
 
 scp = True
 ben = False
-mhs = ['WSO', 'MFO']
+mhs = ['WSO', 'GWO', 'PSA', 
+    #    'SCA', 'WOA', 'MFO'
+       ]
 cantidad = 0
 
 DS_actions = [
@@ -33,26 +35,35 @@ paramsML = json.dumps({
 if scp:
     # poblar ejecuciones SCP
     instancias = bd.obtenerInstancias(f'''
-                                      'scp41', 'scp42', 'scp43', 'scp44'
+                                      "scpd1"
                                       ''')
-    print(instancias)
     iteraciones = 100
     experimentos = 1
-    poblacion = 30
+    poblacion = 20
     for instancia in instancias:
 
         for mh in mhs:
-            data = {}
-            data['MH']          = mh
-            data['paramMH']     = f'iter:{str(iteraciones)},pop:{str(poblacion)},DS:S4-COM,repair:complex,cros:0.9;mut:0.20'
-            data['ML']          = ''
-            data['paramML']     = ''
-            data['ML_FS']       = ''
-            data['paramML_FS']  = ''
-            data['estado']      = 'pendiente'
+            binarizaciones = [
+                            #   'S2-STD','S2-STD_LOG','S2-STD_PIECE','S2-STD_SINE','S2-STD_SINGER','S2-STD_SINU','S2-STD_TENT','S2-STD_CIRCLE',
+                            #   'S2-COM','S2-COM_LOG','S2-COM_PIECE','S2-COM_SINE','S2-COM_SINGER','S2-COM_SINU','S2-COM_TENT','S2-COM_CIRCLE',
+                            #   'S2-ELIT','S2-ELIT_LOG','S2-ELIT_PIECE','S2-ELIT_SINE',
+                              'S2-ELIT_SINGER',
+                            #   'S2-ELIT_SINU','S2-ELIT_TENT','S2-ELIT_CIRCLE'
+                              ]
+            for binarizacion in binarizaciones:
+                
+                data = {}
+                data['experimento'] = f'{mh} {binarizacion}'
+                data['MH']          = mh
+                data['paramMH']     = f'iter:{str(iteraciones)},pop:{str(poblacion)},DS:{binarizacion},repair:complex,cros:0.9;mut:0.20'
+                data['ML']          = ''
+                data['paramML']     = ''
+                data['ML_FS']       = ''
+                data['paramML_FS']  = ''
+                data['estado']      = 'pendiente'
 
-            cantidad +=experimentos
-            bd.insertarExperimentos(data, experimentos, instancia[0])
+                cantidad +=experimentos
+                bd.insertarExperimentos(data, experimentos, instancia[0])
             
 if ben:
     # poblar ejecuciones Benchmark

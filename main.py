@@ -1,5 +1,6 @@
 from Solver.solverSCP import solverSCP
-from Solver.solverB import solverB
+from Solver.solverSCP_ChaoticMaps import solverSCP_ChaoticMaps
+
 from BD.sqlite import BD
 import json
 # problems = ['ionosphere.data']
@@ -8,6 +9,7 @@ bd = BD()
 data = bd.obtenerExperimento()
 
 id              = 0
+experimento     = ''
 instancia       = ''
 problema        = ''
 mh              = ''
@@ -25,16 +27,17 @@ while len(data) > 0:
     print(data)
     
     id = int(data[0][0])
-    id_instancia = int(data[0][8])
+    id_instancia = int(data[0][9])
     datosInstancia = bd.obtenerInstancia(id_instancia)
     print(datosInstancia)
     
     problema = datosInstancia[0][1]
     instancia = datosInstancia[0][2]
     parametrosInstancia = datosInstancia[0][4]
-    mh = data[0][1]
-    parametrosMH = data[0][2]
-    ml = data[0][3]
+    experimento = data[0][1]
+    mh = data[0][2]
+    parametrosMH = data[0][3]
+    ml = data[0][4]
 
     
     maxIter = int(parametrosMH.split(",")[0].split(":")[1])
@@ -43,22 +46,25 @@ while len(data) > 0:
     
     if problema == 'SCP':
         bd.actualizarExperimento(id, 'ejecutando')
+        print("-------------------------------------------------------------------------------------------------------")
+        print(f"Ejecutando el experimento: {experimento} - id: {str(id)}")
+        print("-------------------------------------------------------------------------------------------------------")
         repair = parametrosMH.split(",")[3].split(":")[1]
         ds.append(parametrosMH.split(",")[2].split(":")[1].split("-")[0])
         ds.append(parametrosMH.split(",")[2].split(":")[1].split("-")[1])
         
         parMH = parametrosMH.split(",")[4]
-        print(parMH)
-        solverSCP(id, mh, maxIter, pop, instancia, ds, repair, parMH)
-    
-    if problema == 'BEN':
-        bd.actualizarExperimento(id, 'ejecutando')
-        lb =  float(parametrosInstancia.split(",")[0].split(":")[1])
-        ub =  float(parametrosInstancia.split(",")[1].split(":")[1])
-        dim =  int(parametrosInstancia.split(",")[2].split(":")[1])
-        solverB(id, mh, maxIter, pop, instancia, lb, ub, dim)
+        
+        separacion = ds[1].split("_")
+        
+        if len(separacion) > 1:
+            solverSCP_ChaoticMaps(id, mh, maxIter, pop, instancia, ds, repair, parMH)
+        else:
+            solverSCP(id, mh, maxIter, pop, instancia, ds, repair, parMH)
         
     data = bd.obtenerExperimento()
+    
+    print(data)
     
     
     pruebas += 1
@@ -68,4 +74,3 @@ print("-------------------------------------------------------")
 print("Se han ejecutado todos los experimentos pendientes.")
 print("-------------------------------------------------------")
 print("-------------------------------------------------------")
-
