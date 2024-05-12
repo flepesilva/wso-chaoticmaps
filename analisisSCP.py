@@ -18,16 +18,16 @@ archivoResumenPercentage.write("instance")
 
 graficos = True
 
-incluye_gwo = False
-incluye_psa = False
+incluye_gwo = True
+incluye_psa = True
 incluye_woa = False
 incluye_sca = False
-incluye_wso = False
+incluye_wso = True
 
 bd = BD()
 
 instancias = bd.obtenerInstancias(f'''
-                                  'scp41', 'scp42', 'scp43', 'scp44', 'scp45', 'scp46', 'scp47', 'scp48', 'scp49', 'scp410'
+                                  'scpd1'
                                   ''')
 print(instancias)
 

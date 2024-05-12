@@ -1,5 +1,6 @@
 import numpy as np
 import os
+from Metaheuristics.WSO import iterarWSO
 from Problem.SCP.problem import SCP
 from Metaheuristics.GWO import iterarGWO
 from Metaheuristics.PSA import iterarPSA
@@ -69,6 +70,8 @@ def solverSCP_ChaoticMaps(id, mh, maxIter, pop, instancia, DS, repairType, param
     
     # Genero una población inicial binaria, esto ya que nuestro problema es binario
     poblacion = np.random.randint(low=0, high=2, size = (pop, instance.getColumns()))
+    v = np.zeros((pop, instance.getColumns()))
+
 
     maxDiversidad = diversidadHussain(poblacion)
     XPL , XPT, state = porcentajesXLPXPT(maxDiversidad, maxDiversidad)
@@ -87,12 +90,13 @@ def solverSCP_ChaoticMaps(id, mh, maxIter, pop, instancia, DS, repairType, param
             
 
         fitness[i] = instance.fitness(poblacion[i])
-        
+    fit = fitness.copy() 
     solutionsRanking = np.argsort(fitness) # rankings de los mejores fitnes
     bestRowAux = solutionsRanking[0]
     # DETERMINO MI MEJOR SOLUCION Y LA GUARDO 
     Best = poblacion[bestRowAux].copy()
     BestFitness = fitness[bestRowAux]
+    wbest = np.copy(poblacion)
     
     # PARA MFO
     BestFitnessArray = fitness[solutionsRanking] 
@@ -152,6 +156,8 @@ def solverSCP_ChaoticMaps(id, mh, maxIter, pop, instancia, DS, repairType, param
             cross = float(param.split(";")[0].split(":")[1])
             muta = float(param.split(";")[1].split(":")[1])
             poblacion = iterarGA(poblacion.tolist(), fitness, cross, muta)
+        if mh == "WSO":
+            poblacion, v = iterarWSO(maxIter, iter, instance.getColumns(), pop, poblacion, Best, None, None , v, wbest)
         
         # Binarizo, calculo de factibilidad de cada individuo y calculo del fitness
         for i in range(poblacion.__len__()):
@@ -167,13 +173,24 @@ def solverSCP_ChaoticMaps(id, mh, maxIter, pop, instancia, DS, repairType, param
 
             fitness[i] = instance.fitness(poblacion[i])
 
+            if(mh == "WSO"):
+                if fitness[i] < fit[i]:
+                    wbest[i, :] = poblacion[i]
+                    fit[i] = fitness[i]
+                if fit[i] < BestFitness:
+                    BestFitness = fit[i]
+                    Best = wbest[i, :]
+
 
         solutionsRanking = np.argsort(fitness) # rankings de los mejores fitness
         
         #Conservo el Best
-        if fitness[solutionsRanking[0]] < BestFitness:
-            BestFitness = fitness[solutionsRanking[0]]
-            Best = poblacion[solutionsRanking[0]]
+        if mh != "WSO":
+            if fitness[solutionsRanking[0]] < BestFitness:
+                BestFitness = fitness[solutionsRanking[0]]
+                Best = poblacion[solutionsRanking[0]]
+
+        print("pepitas")
         matrixBin = poblacion.copy()
 
         div_t = diversidadHussain(poblacion)

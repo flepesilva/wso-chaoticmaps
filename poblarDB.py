@@ -6,7 +6,9 @@ bd = BD()
 
 scp = True
 ben = False
-mhs = ['WSO', 'GWO', 'PSA', 
+mhs = [
+       'WSO', 
+       'GWO', 'PSA', 
     #    'SCA', 'WOA', 'MFO'
        ]
 cantidad = 0

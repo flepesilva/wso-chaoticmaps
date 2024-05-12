@@ -57,4 +57,5 @@ def iterarGWO(maxIter, t, dimension, poblacion, fitness, typeProblem):
             X3 = Xdelta[j] - (A3 * ddelta) 
             # aplicacion de la ecuacion 3.7
             poblacion[i][j] = (X1+X2+X3)/3
+            
     return np.array(poblacion)
