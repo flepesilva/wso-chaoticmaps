@@ -1,0 +1,5 @@
+, ,scpd1, , 
+experiment ,best, avg. , RPD 
+WSO S2-ELIT_SINGER,62.0,62.0,3.333 
+GWO S2-ELIT_SINGER,61.0,61.0,1.667 
+PSA S2-ELIT_SINGER,61.0,61.0,1.667 

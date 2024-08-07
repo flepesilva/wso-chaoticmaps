@@ -2,6 +2,7 @@ import time
 import numpy as np
 from Diversity.hussainDiversity import diversidadHussain
 from Diversity.XPLXTP import porcentajesXLPXPT
+from Metaheuristics.WSO import iterarWSO
 from Problem.Benchmark.Problem import fitness as f
 from Metaheuristics.GWO import iterarGWO
 from Metaheuristics.PSA import iterarPSA
@@ -31,6 +32,7 @@ def solverB(id, mh, maxIter, pop, function, lb, ub, dim):
     
     # Genero una población inicial continua. Acá estamos resolviendo las funciones matemáticas benchmark.
     poblacion = np.random.uniform(low=lb, high=ub, size = (pop, dim))
+    v = np.zeros((pop, dim))
     
     maxDiversidad = diversidadHussain(poblacion)
     XPL , XPT, state = porcentajesXLPXPT(maxDiversidad, maxDiversidad)
@@ -52,12 +54,13 @@ def solverB(id, mh, maxIter, pop, function, lb, ub, dim):
             poblacion[i, j] = np.clip(poblacion[i, j], lb[j], ub[j])            
 
         fitness[i] = f(function, poblacion[i])
-        
+    fit = fitness
     solutionsRanking = np.argsort(fitness) # rankings de los mejores fitnes
     bestRowAux = solutionsRanking[0]
     # DETERMINO MI MEJOR SOLUCION Y LA GUARDO 
     Best = poblacion[bestRowAux].copy()
     BestFitness = fitness[bestRowAux]
+    wbest = np.copy(poblacion)
     
     tiempoInicializacion2 = time.time()
     
@@ -96,8 +99,11 @@ def solverB(id, mh, maxIter, pop, function, lb, ub, dim):
             poblacion = iterarWOA(maxIter, iter, dim, poblacion.tolist(), Best.tolist())
         if mh == 'PSA':
             poblacion = iterarPSA(maxIter, iter, dim, poblacion.tolist(), Best.tolist())
+        if( mh == 'WSO'):
+            poblacion, v = iterarWSO(maxIter, iter, dim, pop, poblacion, Best, lb, ub, v, wbest)
         
         # calculo de factibilidad de cada individuo y calculo del fitness inicial
+        # if mh != 'WSO':
         for i in range(poblacion.__len__()):
             for j in range(dim):
                 poblacion[i, j] = np.clip(poblacion[i, j], lb[j], ub[j])            
@@ -105,11 +111,17 @@ def solverB(id, mh, maxIter, pop, function, lb, ub, dim):
             fitness[i] = f(function, poblacion[i])
             
         solutionsRanking = np.argsort(fitness) # rankings de los mejores fitness
-        
+
         #Conservo el Best
         if fitness[solutionsRanking[0]] < BestFitness:
             BestFitness = fitness[solutionsRanking[0]]
             Best = poblacion[solutionsRanking[0]]
+
+        #wbest
+        if mh == 'WSO':
+            if fitness[solutionsRanking[0]] < fit[bestRowAux]:
+                wbest[bestRowAux, :] = poblacion[solutionsRanking[0], :]
+                fit[bestRowAux] = fitness[solutionsRanking[0]]
 
         div_t = diversidadHussain(poblacion)
 

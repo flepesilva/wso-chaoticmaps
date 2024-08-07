@@ -4,9 +4,11 @@ import json
 bd = BD()
 
 
-scp = False
-ben = True
-mhs = ['WOA','GWO']
+scp = True
+ben = False
+mhs = [
+       'WSO'
+       ]
 cantidad = 0
 
 DS_actions = [
@@ -33,33 +35,38 @@ paramsML = json.dumps({
 if scp:
     # poblar ejecuciones SCP
     instancias = bd.obtenerInstancias(f'''
-                                      'scp41'
+                                      "scp41"
                                       ''')
-    print(instancias)
-    iteraciones = 20
-    experimentos = 3
-    poblacion = 10
+    iteraciones = 100
+    experimentos = 1
+    poblacion = 30
     for instancia in instancias:
 
         for mh in mhs:
-            data = {}
-            data['MH']          = mh
-            data['paramMH']     = f'iter:{str(iteraciones)},pop:{str(poblacion)},DS:S4-COM,repair:complex,cros:0.9;mut:0.20'
-            data['ML']          = ''
-            data['paramML']     = ''
-            data['ML_FS']       = ''
-            data['paramML_FS']  = ''
-            data['estado']      = 'pendiente'
+            binarizaciones = [
+                              'S2-ELIT'
+                              ]
+            for binarizacion in binarizaciones:
+                
+                data = {}
+                data['experimento'] = f'{mh} {binarizacion}'
+                data['MH']          = mh
+                data['paramMH']     = f'iter:{str(iteraciones)},pop:{str(poblacion)},DS:{binarizacion},repair:complex,cros:0.9;mut:0.20'
+                data['ML']          = ''
+                data['paramML']     = ''
+                data['ML_FS']       = ''
+                data['paramML_FS']  = ''
+                data['estado']      = 'pendiente'
 
-            cantidad +=experimentos
-            bd.insertarExperimentos(data, experimentos, instancia[0])
+                cantidad +=experimentos
+                bd.insertarExperimentos(data, experimentos, instancia[0])
             
 if ben:
     # poblar ejecuciones Benchmark
     instancias = bd.obtenerInstancias(f'''
-                                      "F1"
+                                      "F1", "F2", "F3"
                                       ''')
-    iteraciones = 500
+    iteraciones = 200
     experimentos = 3 
     poblacion = 10
     for instancia in instancias:
