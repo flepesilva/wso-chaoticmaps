@@ -70,6 +70,7 @@ def solverSCP(id, mh, maxIter, pop, instancia, DS, repairType, param):
     bestSolutions = poblacion[solutionsRanking]
     
     matrixBin = poblacion.copy()
+    matrixBinVelocity = v.copy()
     
     tiempoInicializacion2 = time.time()
     
@@ -130,6 +131,8 @@ def solverSCP(id, mh, maxIter, pop, instancia, DS, repairType, param):
 
             if mh != "GA":
                 poblacion[i] = b.aplicarBinarizacion(poblacion[i].tolist(), DS[0], DS[1], Best, matrixBin[i].tolist(), iter, pop, maxIter, i, chaotic_map)
+            if mh == "WSO":
+                v[i] = b.aplicarBinarizacion(v[i].tolist(), DS[0], DS[1], Best, matrixBinVelocity[i].tolist(), iter, pop, maxIter, i, chaotic_map)
             flag, aux = instance.factibilityTest(poblacion[i])
 
             # print(aux)
@@ -138,21 +141,26 @@ def solverSCP(id, mh, maxIter, pop, instancia, DS, repairType, param):
             
 
             fitness[i] = instance.fitness(poblacion[i])
+
+            if(mh == "WSO"):
+                if fitness[i] < fit[i]:
+                    wbest[i] = poblacion[i]
+                    fit[i] = fitness[i]
+                # if fit[i] < BestFitness:
+                #     BestFitness = fit[i]
+                #     Best = wbest[i]
+
         solutionsRanking = np.argsort(fitness) # rankings de los mejores fitness
 
-        # if(fitness[solutionsRanking[0]] < fit[bestRowAux]):
-        #     wbest[bestRowAux, :] = poblacion[solutionsRanking[0], :]
-        #     fit[bestRowAux] = fitness[solutionsRanking[0]]
-        
-        #Conservo el Best
+
         if fitness[solutionsRanking[0]] < BestFitness:
             BestFitness = fitness[solutionsRanking[0]]
             Best = poblacion[solutionsRanking[0]]
-            wbest = np.copy(poblacion)
         
         print("------------------------------------------------------------------------------------------------------")
 
         matrixBin = poblacion.copy()
+        matrixBinVelocity = v.copy()
 
         div_t = diversidadHussain(poblacion)
 

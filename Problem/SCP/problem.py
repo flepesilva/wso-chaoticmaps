@@ -226,7 +226,6 @@ class SCP:
         reparaciones = 0
         while not feasible:
             r_no_cubiertas = np.zeros((self.getRows()))
-            
             r_no_cubiertas[np.argwhere(aux == 0)] = 1           # Vector indica las restricciones no cubiertas
             # print(r_no_cubiertas)
             cnc = np.dot(r_no_cubiertas, set)                   # Cantidad de restricciones no cubiertas que cubre cada columna (de tamaño n)
@@ -238,8 +237,7 @@ class SCP:
             solution[idx] = 1                                   # Asigno 1 a esa columna
             feasible, aux = self.factibilityTest(solution)      # Verifico si la solucion actualizada es factible
             reparaciones += 1
-
-        
+            # print(f'reparacion {reparaciones}')
         return solution
 
     def fitness(self, solution):

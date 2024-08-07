@@ -120,7 +120,12 @@ def WSO(max_iter, whiteSharks, lb, ub, dim, fobj):
                 print(fit[i])
                 print(fitness[i])
                 if fit[i] < fitness[i]:
-                    print('ENTRO AL 1')
+                    # indenta el print para que se vea mejor
+                    print
+                    print('ENTRO AL 1 /n')
+                    print('ENTRO AL 1 /n')
+                    print('ENTRO AL 1 /n')
+                    print('ENTRO AL 1 /n')
                     wbest[i, :] = WSO_Positions[i, :] #actualizar la mejor posicion
                     fitness[i] = fit[i] #Actualizar el fitness
                 # Encontrar las mejores posiciones.

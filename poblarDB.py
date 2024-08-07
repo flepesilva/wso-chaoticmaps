@@ -7,9 +7,7 @@ bd = BD()
 scp = True
 ben = False
 mhs = [
-       'WSO', 
-       'GWO', 'PSA', 
-    #    'SCA', 'WOA', 'MFO'
+       'WSO'
        ]
 cantidad = 0
 
@@ -37,20 +35,16 @@ paramsML = json.dumps({
 if scp:
     # poblar ejecuciones SCP
     instancias = bd.obtenerInstancias(f'''
-                                      "scpd1"
+                                      "scp41"
                                       ''')
     iteraciones = 100
     experimentos = 1
-    poblacion = 20
+    poblacion = 30
     for instancia in instancias:
 
         for mh in mhs:
             binarizaciones = [
-                            #   'S2-STD','S2-STD_LOG','S2-STD_PIECE','S2-STD_SINE','S2-STD_SINGER','S2-STD_SINU','S2-STD_TENT','S2-STD_CIRCLE',
-                            #   'S2-COM','S2-COM_LOG','S2-COM_PIECE','S2-COM_SINE','S2-COM_SINGER','S2-COM_SINU','S2-COM_TENT','S2-COM_CIRCLE',
-                            #   'S2-ELIT','S2-ELIT_LOG','S2-ELIT_PIECE','S2-ELIT_SINE',
-                              'S2-ELIT_SINGER',
-                            #   'S2-ELIT_SINU','S2-ELIT_TENT','S2-ELIT_CIRCLE'
+                              'S2-ELIT'
                               ]
             for binarizacion in binarizaciones:
                 
@@ -72,7 +66,7 @@ if ben:
     instancias = bd.obtenerInstancias(f'''
                                       "F1", "F2", "F3"
                                       ''')
-    iteraciones = 500
+    iteraciones = 200
     experimentos = 3 
     poblacion = 10
     for instancia in instancias:

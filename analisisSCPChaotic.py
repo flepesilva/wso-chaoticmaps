@@ -128,6 +128,7 @@ if graficos:
                     # print("-------------------------------------------------------------------------------")
                     util.writeTofile(archivo,direccionDestiono)                        
                     data = pd.read_csv(direccionDestiono, on_bad_lines='skip')
+                    print(len(data['iter']))
                     if len(data['iter']) == 501:
                         iteraciones = data['iter']
                     fitness     = data['fitness']

@@ -161,7 +161,6 @@ def solverSCP_ChaoticMaps(id, mh, maxIter, pop, instancia, DS, repairType, param
         
         # Binarizo, calculo de factibilidad de cada individuo y calculo del fitness
         for i in range(poblacion.__len__()):
-
             if mh != "GA":
                 poblacion[i] = b.aplicarBinarizacion(poblacion[i].tolist(), DS[0], DS[1], Best, matrixBin[i].tolist(), iter, pop, maxIter, i, chaotic_map)
 
@@ -170,27 +169,21 @@ def solverSCP_ChaoticMaps(id, mh, maxIter, pop, instancia, DS, repairType, param
             if not flag: #solucion infactible
                 poblacion[i] = instance.repair(poblacion[i], repairType)
                 
-
             fitness[i] = instance.fitness(poblacion[i])
-
             if(mh == "WSO"):
                 if fitness[i] < fit[i]:
-                    wbest[i, :] = poblacion[i]
+                    wbest[i] = poblacion[i]
                     fit[i] = fitness[i]
-                if fit[i] < BestFitness:
-                    BestFitness = fit[i]
-                    Best = wbest[i, :]
-
+                # if fit[i] < BestFitness:
+                #     BestFitness = fit[i]
+                #     Best = wbest[i]
 
         solutionsRanking = np.argsort(fitness) # rankings de los mejores fitness
-        
-        #Conservo el Best
-        if mh != "WSO":
-            if fitness[solutionsRanking[0]] < BestFitness:
-                BestFitness = fitness[solutionsRanking[0]]
-                Best = poblacion[solutionsRanking[0]]
 
-        print("pepitas")
+        if fitness[solutionsRanking[0]] < BestFitness:
+            BestFitness = fitness[solutionsRanking[0]]
+            Best = poblacion[solutionsRanking[0]]
+
         matrixBin = poblacion.copy()
 
         div_t = diversidadHussain(poblacion)
